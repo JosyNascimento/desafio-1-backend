@@ -70,6 +70,11 @@ class ProductManager {
       console.error("Erro ao salvar produtos:", error);
     }
   }
+
+  // retorna todos os produtos
+  async getAllProducts() {
+    return this.products;
+  }
 }
 
 module.exports = ProductManager;
