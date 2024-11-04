@@ -1,23 +1,29 @@
 const express = require('express');
-const ProductManager = require('./ProductManager'); // Ajuste o caminho se necessário
+const ProductManager = require('./ProductManager'); 
 
 const app = express();
 const port = 3000;
 
 const productManager = new ProductManager();
 
-// Middleware para parsear JSON
+// Middleware parsear JSON
 app.use(express.json());
+
+// Carregar produtos antes de iniciar o servidor
+(async () => {
+  await productManager.loadProducts();
+})();
 
 // Rota para buscar um produto pelo ID
 app.get('/products/:pid', async (req, res) => {
   const pid = Number(req.params.pid);
-  const product = productManager.getProductById(pid);
-
-  if (!product) {
-    return res.status(404).json({ error: 'Produto não encontrado' });
+  
+  try {
+    const product = await productManager.getProductById(pid);
+    return res.json(product);
+  } catch (error) {
+    return res.status(404).json({ error: error.message });
   }
-  return res.json(product);
 });
 
 // Iniciar o servidor

@@ -5,7 +5,10 @@ class ProductManager {
   constructor() {
     this.products = [];
     this.nextId = 1; // ID do produto a ser adicionado
-    this.loadProducts(); // Carrega os produtos ao iniciar
+  }
+
+  async initialize() {
+    await this.loadProducts(); // Carrega os produtos ao iniciar
   }
 
   async loadProducts() {
