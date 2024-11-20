@@ -19,27 +19,31 @@ router.post("/", async (req, res) => {
 
     const data = await fs.readFile(cartsFilePath, "utf-8");
     const cartsData = JSON.parse(data);
-
+    
     // Verifica se o arquivo JSON contém a chave 'carts', caso contrário, cria
     const carts = cartsData.carts || [];
-
+    
+    // Gera um novo id para o carrinho
+    const newId = carts.length > 0 ? carts[carts.length - 1].id + 1 : 1; // Corrigido o nome da variável
+    
     // Cria um novo carrinho
     const newCart = {
-      id: carts.length + 1, // Define um ID único para o carrinho
-      products,
+      id: newId, // Define um ID único para o carrinho
+      products: [] // Adicionando um array de produtos vazio, já que estamos criando um novo carrinho
     };
-
+    
     // Adiciona o novo carrinho à lista de carrinhos
     carts.push(newCart);
-
+    
     // Salva novamente os dados no arquivo JSON
     await fs.writeFile(cartsFilePath, JSON.stringify({ carts }, null, 2));
-
+    
     res.status(201).json({ message: "Carrinho adicionado com sucesso", cartId: newCart.id });
-  } catch (error) {
-    console.error("Erro ao adicionar carrinho:", error);
-    res.status(500).json({ error: "Erro ao adicionar carrinho" });
-  }
+    } catch (error) {
+      console.error("Erro ao adicionar carrinho:", error);
+      res.status(500).json({ error: "Erro ao adicionar carrinho" });
+    }
+    
 });
 
 // Rota para buscar carrinho por ID
@@ -67,6 +71,13 @@ router.get("/:cid", async (req, res) => {
 router.post("/:cid/product/:pid", async (req, res) => {
   try {
     const { cid, pid } = req.params;
+    const { quantity } = req.body; // Quantidade fornecida pelo cliente
+
+      // Verificar se a quantidade foi fornecida e é válida
+      if (!quantity || quantity <= 0) {
+        return res.status(400).json({ error: "Quantidade inválida. Deve ser um número maior que 0." });
+      }
+  
 
     const data = await fs.readFile(cartsFilePath, "utf-8");
     const carts = JSON.parse(data).carts;

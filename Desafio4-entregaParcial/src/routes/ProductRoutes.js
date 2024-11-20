@@ -53,12 +53,19 @@ router.post("/", async (req, res) => {
 
     const products = productsData.products || [];
 
+    const newid = products.length> 0 ? products[products.length - 1]. id + 1 : 1;
+
+    
     // Cria um novo produto
-    const newProduct = {
-      id: products.length + 1, // Definindo um ID único para o produto
+    const newProduct = { id: newId, // Definindo um ID único para o produto
       name,
       price,
       description,
+      quantity,
+      stock,
+      category,
+      thumbnails,
+      status: status || "true "
     };
 
     products.push(newProduct);
@@ -73,18 +80,13 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Rota PUT para atualizar um produto
+// // Rota PUT para atualizar um produto
 router.put("/:pid", async (req, res) => {
   try {
     const productId = parseInt(req.params.pid, 10);
-    const { name, price, description } = req.body;
 
-    // Verifica se os dados necessários foram fornecidos
-    if (!name || !price || !description) {
-      return res.status(400).json({ error: "Faltando dados para atualizar o produto" });
-    }
 
-    const data = await fs.readFile(productsFilePath, "utf-8");
+     const data = await fs.readFile(productsFilePath, "utf-8");
     const productsData = JSON.parse(data);
 
     const products = productsData.products || [];
@@ -95,7 +97,8 @@ router.put("/:pid", async (req, res) => {
     }
 
     // Atualiza o produto
-    products[productIndex] = { id: productId, name, price, description };
+    //products[productindex] = { id: productid, name, price, description};
+    products[productIndex] = { ...products[productIndex], ...updatedProduct };
 
     // Salva novamente os dados no arquivo JSON
     await fs.writeFile(productsFilePath, JSON.stringify({ products }, null, 2));
