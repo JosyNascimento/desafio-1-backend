@@ -2,7 +2,7 @@
 class ProductManager {
   constructor() {
     this.products = [];
-    this.nextId = 1;  // Variável para gerenciar o ID dos novos produtos
+    this.nextId = 1; // Variável para gerenciar o ID dos novos produtos
   }
 
   // Carrega produtos (exemplo: de um banco de dados ou arquivo)
@@ -35,6 +35,29 @@ class ProductManager {
 
     this.products.push(newProduct); // Adiciona o novo produto
     return newProduct; // Retorna o produto recém-adicionado
+  }
+
+  // Método para atualizar um produto existente
+  async updateProduct(id, updatedProductData) {
+    const productIndex = this.products.findIndex(p => p.id === id);
+    if (productIndex !== -1) {
+      this.products[productIndex] = {
+        ...this.products[productIndex],
+        ...updatedProductData,
+      };
+      return this.products[productIndex];
+    }
+    return null; // Caso o produto não seja encontrado
+  }
+
+  // Método para deletar um produto
+  async deleteProduct(id) {
+    const productIndex = this.products.findIndex(p => p.id === id);
+    if (productIndex !== -1) {
+      const deletedProduct = this.products.splice(productIndex, 1)[0];
+      return deletedProduct;
+    }
+    return null; // Caso o produto não seja encontrado
   }
 }
 
