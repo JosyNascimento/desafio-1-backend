@@ -14,12 +14,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configuração do Handlebars como Template Engine
-app.engine("handlebars", handlebars.engine());
+app.engine("handlebars", handlebars.engine({
+  defaultLayout: 'main'  // Define 'main.handlebars' como o layout padrão
+}));
+
 app.set("view engine", "handlebars");
 app.set("views", __dirname + "/views");
 
 // Configuração para arquivos estáticos
-app.use(express.static(__dirname + "/public"));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  console.log('Requisição recebida para:', req.url);
+  next();
+});
 
 // Lista de produtos inicial
 let products = [
