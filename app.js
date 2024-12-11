@@ -5,6 +5,8 @@ const { Server } = require("socket.io");
 const http = require("http");
 const connectMongo = require('./dao/MongoDB/connection');
 const Message = require('./dao/models/message.model'); // Modelo de mensagens
+const Product = require('./dao/models/product.model');  // Ajuste o caminho se necessário
+const Cart = require('./dao/models/cart.model'); // Ajuste o caminho se necessário
 
 connectMongo(); // Conecta ao MongoDB usando o arquivo de conexão
 
@@ -62,6 +64,55 @@ app.post('/addProduct', (req, res) => {
     product: newProduct
   });
 });
+
+
+
+app.post('/addToCart', async (req, res) => {
+  const { productId, quantity } = req.body;
+
+  try {
+    // Verificando se o produto existe
+    const product = await Product.findById(productId);  // Produto sendo buscado pelo ID
+    if (!product) {
+      return res.status(404).json({ message: 'Produto não encontrado!' });
+    }
+
+    // Procurando o carrinho do usuário
+    let cart = await Cart.findOne();
+
+    if (!cart) {
+      // Caso não tenha carrinho, cria um novo
+      cart = new Cart();
+    }
+
+    // Verificando se o produto já existe no carrinho
+    const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
+    if (itemIndex > -1) {
+      // Se o produto já existe no carrinho, atualiza a quantidade
+      cart.items[itemIndex].quantity += quantity;
+    } else {
+      // Caso não exista, adiciona um novo item ao carrinho
+      cart.items.push({ productId, quantity });
+    }
+
+    // Salvando o carrinho
+    await cart.save();
+
+    // Respondendo com o carrinho atualizado
+    res.status(200).json({
+      message: 'Produto adicionado ao carrinho com sucesso!',
+      cart
+    });
+
+  } catch (error) {
+    // Exibindo detalhes do erro para facilitar o diagnóstico
+    console.error('Erro ao adicionar ao carrinho:', error);
+    res.status(500).json({ message: 'Erro ao adicionar produto ao carrinho', error: error.message });
+  }
+});
+
+
 
 // Comunicação via WebSocket
 io.on("connection", (socket) => {
