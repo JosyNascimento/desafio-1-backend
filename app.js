@@ -50,6 +50,8 @@ app.get("/chat", (req, res) => {
   res.render("chat", { title: "Chat em Tempo Real" });
 });
 
+
+
 app.post('/addProduct', (req, res) => {
   const { title, description, price } = req.body;
   
