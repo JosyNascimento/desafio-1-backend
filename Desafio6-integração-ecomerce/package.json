@@ -1,0 +1,19 @@
+{
+  "name": "desafio5-websocketshandlebars",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "nodemon .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Joseilda",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1",
+    "express-handlebars": "^8.0.1",
+    "mongoose": "^8.8.4",
+    "socket.io": "^4.8.1"
+  }
+}
