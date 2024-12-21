@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrinho de Compras</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Carrinho de Compras</h1>
+      <h2>Itens no Carrinho</h2>
+    </header>
+
+    {{#if cart.items && cart.items.length > 0}} <!-- Verifica se há itens no carrinho -->
+      <section class="cart-container">
+        <ul id="cartList">
+          {{#each cart.items}} <!-- Itera sobre os itens no carrinho -->
+            <li>
+              <h3>{{this.productId.title}}</h3> <!-- Título do produto -->
+              <p>{{this.productId.description}}</p> <!-- Descrição do produto -->
+              <p>Preço: R$ {{formatPrice this.productId.price}}</p> <!-- Exibe o preço usando o helper formatPrice -->
+              <p>Quantidade: {{this.quantity}}</p> <!-- Exibe a quantidade -->
+            </li>
+          {{/each}}
+        </ul>
+
+        <div class="total">
+          <h2>Total: R$ {{totalPrice cart}}</h2> <!-- Exibe o total do carrinho -->
+        </div>
+      </section>
+    {{else}}
+      <p>Seu carrinho está vazio.</p> <!-- Caso o carrinho esteja vazio -->
+    {{/if}}
+
+    <a href="/products" class="continue-shopping">Continuar Comprando</a>
+  </div>
+</body>
+</html>
