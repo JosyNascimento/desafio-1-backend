@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/css/styles.css">
+
+  <title>Produtos em Tempo Real</title>
+ 
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Lista de Produtos</h1>
+    </header>
+
+    <section class="product-list-container">
+      <ul id="productList">
+        <!-- Lista de produtos será inserida aqui dinamicamente -->
+      </ul>
+    </section>
+
+    <section class="form-container">
+      <h2>Adicionar Produto</h2>
+      <form id="addProductForm">
+        <input type="text" id="productTitle" placeholder="Nome do Produto" required />
+        <input type="text" id="productDescription" placeholder="Descrição" required />
+        <input type="number" id="productPrice" placeholder="Preço" required />
+        <button type="submit">Adicionar Produto</button>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    // Função para obter a lista de produtos do servidor
+    async function fetchProducts() {
+      try {
+        const response = await fetch('/products');
+        const data = await response.json();
+        
+        if (data.products) {
+          const productList = document.getElementById('productList');
+          productList.innerHTML = '';  // Limpa a lista antes de adicionar novos produtos
+
+          // Adiciona cada produto à lista
+          data.products.forEach(product => {
+            const li = document.createElement('li');
+            li.textContent = `${product.title} - ${product.description} - R$${product.price}`;
+            productList.appendChild(li);
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao buscar os produtos:', error);
+      }
+    }
+
+    // Chama a função para carregar os produtos ao carregar a página
+    fetchProducts();
+
+    // Lógica para adicionar um produto via form
+    const addProductForm = document.getElementById('addProductForm');
+    addProductForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('productTitle').value;
+      const description = document.getElementById('productDescription').value;
+      const price = document.getElementById('productPrice').value;
+
+      const newProduct = {
+        title,
+        description,
+        price
+      };
+
+      try {
+        // Adiciona o produto via API
+        const response = await fetch('/addProduct', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newProduct)
+        });
+
+        const data = await response.json();
+        if (data.message === 'Produto adicionado com sucesso') {
+          // Atualiza a lista de produtos
+          fetchProducts();
+        } else {
+          alert('Erro ao adicionar produto');
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar o produto:', error);
+      }
+    });
+  </script>
+</body>
+</html>
+
