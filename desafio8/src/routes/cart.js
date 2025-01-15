@@ -1,22 +1,19 @@
-// routes/cart.js
 const express = require('express');
-const CartManager = require('../CartManager');
+const Cart = require("../dao/models/carts.model");
+const Product = require("../dao/models/product.model");
 const router = express.Router();
-const cartManager = new CartManager();
-const cart = await Cart.findOne({ userId: req.user.id }); // Exemplo de busca por ID de usuário
-(async () => {
-  await cartManager.loadCarts();
-  await cartManager.loadProducts();  // Carregar os produtos também
-})();
-// Criar um novo carrinho
+
+// Rota POST para criar um novo carrinho
 router.post('/', async (req, res) => {
   try {
+    // Exemplo: Criando um novo carrinho
     const newCart = await cartManager.createCart();
     return res.status(201).json(newCart);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 });
+
 // Buscar carrinho por ID
 router.get('/:cid', async (req, res) => {
   const cid = Number(req.params.cid);
@@ -31,7 +28,7 @@ router.get('/:cid', async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
-// Adicionar produto ao carrinho
+
 // Rota POST para adicionar produto ao carrinho
 router.post('/cart', async (req, res) => {
   const { productId, quantity } = req.body;
@@ -75,23 +72,79 @@ router.post('/cart', async (req, res) => {
   }
 });
 
+// Rota PUT para atualizar quantidade no carrinho
+router.put("/:cid/products/:pid", async (req, res) => {
+  const { cid, pid } = req.params;
+  const { quantity } = req.body;
+  try {
+    const cart = await Cart.findById(cid);
+    if (!cart)
+      return res.status(404).json({ message: "Carrinho não encontrado!" });
+
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId.toString() === pid
+    );
+    if (itemIndex > -1) {
+      cart.items[itemIndex].quantity = quantity;
+      await cart.save();
+      res.status(200).json({
+        status: "success",
+        message: "Quantidade atualizada com sucesso!",
+        cart,
+      });
+    } else {
+      res.status(404).json({ message: "Produto não encontrado no carrinho!" });
+    }
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
 // Rota para exibir o carrinho
 router.get("/", async (req, res) => {
   try {
-    const cart = await Cart.findOne();  // Encontrar o carrinho (ajuste conforme seu modelo)
+    const cart = await Cart.findOne({ userId: req.user.id }); // Certifique-se de que "req.user" esteja definido corretamente
     if (!cart) {
-      return res.render("cart", { message: "Carrinho não encontrado" });
+      return res.render("cart", {
+        title: "Carrinho",
+        cart: { items: [] },
+        totalQuantity: 0,
+        totalPrice: 0,
+      });
     }
-    // Calcular o total
-    let totalPrice = 0;
-    cart.items.forEach(item => {
-      totalPrice += item.quantity * item.productId.price;  // Ajuste aqui conforme seu modelo
-    });
-    // Renderizar a página do carrinho, passando o totalPrice
-    res.render("cart", { title: "Carrinho de Compras", cart, totalPrice });
+
+    const totalQuantity = cart.items.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+    const totalPrice = cart.items
+      .reduce((total, item) => total + item.productId.price * item.quantity, 0)
+      .toFixed(2);
+
+    res.render("cart", { title: "Carrinho", cart, totalQuantity, totalPrice });
   } catch (error) {
-    console.error('Erro ao carregar o carrinho:', error);
-    res.status(500).json({ message: 'Erro ao carregar o carrinho', error: error.message });
+    console.error("Erro ao carregar o carrinho:", error);
+    res.status(500).send("Erro ao carregar o carrinho.");
   }
 });
+
+// Rota DELETE para limpar o carrinho
+router.delete("/:cid", async (req, res) => {
+  const { cid } = req.params;
+  try {
+    const cart = await Cart.findById(cid);
+    if (!cart)
+      return res.status(404).json({ message: "Carrinho não encontrado!" });
+
+    cart.items = [];
+    await cart.save();
+
+    res
+      .status(200)
+      .json({ status: "success", message: "Carrinho limpo com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
 module.exports = router;
