@@ -1,4 +1,4 @@
-// authenticate.js
+
 const authenticate = (req, res, next) => {
     console.log(req.session?.user); 
     // Verifique a autenticação, como um token JWT ou sessão
