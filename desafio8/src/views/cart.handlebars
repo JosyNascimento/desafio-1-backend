@@ -1,0 +1,39 @@
+
+      <h1>Carrinho de Compras</h1>
+      <h2>Itens no Carrinho</h2>
+  
+ {{#if cart.items.length}}
+    <table>
+      <thead>
+        <tr>
+          <th>Imagem</th>
+          <th>Produto</th>
+          <th>Quantidade</th>
+          <th>Preço Unitário</th>
+          <th>Total</th>
+
+          
+        </tr>
+      </thead>
+      <tbody>
+        {{#each cart.items}}
+          <tr>
+            <td>
+              <img src="{{this.productId.imageUrl}}" alt="{{this.productId.name}}" width="100">
+            </td>
+            <td>{{this.productId.name}}</td>
+            <td>{{this.quantity}}</td>
+            <td>R$ {{this.productId.price}}</td>
+            <td>R$ {{calculateTotal this.productId.price this.quantity}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <div>
+      <p>Total de Itens: {{totalQuantity}}</p>
+      <p>Preço Total: R$ {{totalPrice}}</p>
+    </div>
+  {{else}}
+    <p>Seu carrinho está vazio.</p>
+    <a href="/products">Continue Shopping</a>
+  {{/if}}

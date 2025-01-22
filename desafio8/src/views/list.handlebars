@@ -1,0 +1,19 @@
+<h1>Lista de Usuários:</h1>
+<ul>
+  {{#each users}}
+    <div style="margin-bottom: 20px; display: flex; align-items: center;">
+      <div style="margin-right: 10px;">
+        <img src="{{avatar}}" alt="Avatar de {{this.first_name}}" width="50" height="50" style="border-radius: 50%;">
+      </div>
+
+      <li>
+        <strong>{{this.first_name}} {{this.last_name}}</strong> - {{this.email}}
+      </li>
+
+      <div style="margin-left: 10px;">
+        <button class="edit-button" data-id="{{this._id}}">Editar</button>
+        <button class="delete-button" data-id="{{this._id}}">Deletar</button>
+      </div>
+    </div>
+  {{/each}}
+</ul>
