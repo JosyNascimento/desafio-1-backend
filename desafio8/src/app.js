@@ -1,6 +1,19 @@
+require('dotenv').config();
+const express = require("express");
+const http = require("http");
+const handlebars = require("express-handlebars");
+const { Server } = require("socket.io");
+const Message = require("./dao/models/message.model"); // Modelo de mensagens
+const cartRouter = require("./routes/carts");
+const productService = require('./dao/MongoDB/productService');
+const cookieParser = require("cookie-parser");
+const mongoStore = require("connect-mongo");
+const viewRouter = require("./routes/view.router");
+const userRouter = require("./routes/user.router");
+const sessionRouter = require("./routes/session.router");
+const session = require('express-session');
 const productRouter = require('./routes/product.router');
 const connectDB = require('./dao/MongoDB/connection'); 
-require('dotenv').config();
 const path = require('path');
 const bodyParser = require('body-parser');
 const setupWebSocket = require("./routes/product.router");
