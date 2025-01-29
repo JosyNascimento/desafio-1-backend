@@ -1,16 +1,23 @@
-<div class="welcome-message">Bem Vindo! Faça login para continuar.</div>
+<div class="welcome-message">Bem-vindo! Faça login para continuar.</div>
 <div class="login-container">
-  <div class=" login-card">
+  <div class="login-card">
+
     <h1>Login</h1>
+
     <form action="/login" method="POST">
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required><br>
-      <label for="senha">Senha:</label>
-      <input type="password" id="password" name="password" required><br>
-      <button type="submit">Entrar</button>
+      <input type="email" id="email" name="email" required aria-label="Digite seu email">
+      <label for="password">Senha:</label>
+      <input type="password" id="password" name="password" required aria-label="Digite sua senha">
+
+      <button type="submit" aria-label="Entrar no sistema">Entrar</button>
+      <a href="/reset-password">Redefinir senha</a>
     </form>
+
+    <a href="/github"><button>Entrar com GitHub</button></a>
   </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   // Captura a query string
@@ -18,19 +25,102 @@
 
   // Verifica se existe o parâmetro 'message'
   if (params.has('message')) {
-    // Obtém o valor de 'message'
     const message = params.get('message');
 
     // Exibe o alerta com SweetAlert
     Swal.fire({
-      icon: 'success',
-      title: 'Sucesso',
+      icon: ['Usuário registrado com sucesso', 'Senha redefinida com sucesso'].includes(message) ? 'success' : 'error',
+      title: ['Usuário registrado com sucesso', 'Senha redefinida com sucesso'].includes(message) ? 'Sucesso' : 'Erro',
       text: message,
       confirmButtonText: 'OK'
     });
 
-    // Remove o parâmetro da URL para evitar re-exibição
+    // Remove o parâmetro da URL
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+
+  // Mensagem de erro exemplo (pode ser alterada pelo backend)
+  if (params.has('error')) {
+    const error = params.get('error');
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: error,
+      confirmButtonText: 'Tentar novamente'
+    });
+
     const newUrl = window.location.pathname;
     window.history.replaceState({}, document.title, newUrl);
   }
 </script>
+
+<style>
+
+
+  .welcome-message {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 30px;
+  }
+
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .login-card {
+    background-color: #c279ac;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    max-width: 90%; /* Ajuste para telas menores */
+  }
+
+  .login-card h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    
+  }
+
+  .login-card label {
+    display: block;
+    margin: 10px 0 5px;
+  }
+
+  .login-card input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .login-card button {
+    width: 100%;
+    padding: 10px;
+    background-color: #af0784;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .login-card button:hover {
+    background-color: #92076f;
+  }
+
+  @media (max-width: 500px) {
+    .login-card {
+      padding: 15px;
+    }
+
+    .welcome-message {
+      font-size: 16px;
+    }
+  }
+</style>

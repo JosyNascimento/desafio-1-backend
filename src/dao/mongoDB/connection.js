@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb+srv://joseildatn:coder@clustercoder.f3sfq.mongodb.net/');
-    console.log('Conectado ao MongoDB com sucesso');
+    await mongoose.connect(process.env.MONGO_URL); 
+    console.log('Conectado ao MongoDB');
   } catch (error) {
-    console.error('Erro ao conectar ao MongoDB: ' + error);
-    process.exit(1); // Encerra o processo se a conexão falhar
+    console.error('Erro ao conectar ao MongoDB:', error);
+    process.exit(1);
   }
 };
 
