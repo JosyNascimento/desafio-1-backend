@@ -1,14 +1,14 @@
-const passport = require('passport');
+const passport = require('../config/passport.config.js');
 
 const renderLoginPage = (req, res) => {
     res.render('login');
 };
 
-const githubAuth = passport.authenticate('github', { scope: ['user:email'] });
+const githubAuth = passport.authenticate('github');
 
-const githubCallback = passport.authenticate('github', { failureRedirect: '/login' }, (req, res) => {
-    req.session.user = req.user;
-    res.redirect('/perfil');
+const githubCallback = passport.authenticate('github', {
+    failureRedirect: '/login',
+    successRedirect: '/perfil'
 });
 
 const loginUser = async (req, res, next) => {
@@ -31,13 +31,12 @@ const failLogin = (req, res) => {
     res.redirect('/login?message=Usuário ou senha inválidos');
 };
 
-const logoutUser = (req, res) => {
-    req.session.destroy(err => {
-        if (!err) {
-            res.send('Logout efetuado com sucesso!');
-        } else {
-            res.send({ status: 'Erro no logout', body: err });
+const logoutUser = async (req, res) => {
+    await req.logout((err) => {
+        if (err) {
+            return next(err);
         }
+        res.redirect('/');
     });
 };
 
